@@ -1,0 +1,10 @@
+function mkcd {
+    if [ $# -ne 1 ]
+    then
+	echo>&2 "Argument error"
+	false
+    else
+	mkdir -p "$1"
+	cd "$1"
+    fi
+}

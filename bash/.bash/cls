@@ -1,0 +1,11 @@
+
+function cls {
+    if [ $# -neq 1 ]
+    then
+	echo "Argument error"
+	false
+    else
+	cd $1
+	ls -l
+    fi
+}

@@ -1,0 +1,13 @@
+function cd.. {
+    if [ $# -eq 0 ]
+    then
+	N=1
+    else
+	N=$1
+    fi
+
+    for i in `seq 1 $N`
+    do
+	cd ..
+    done
+}
