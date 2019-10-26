@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 SHORT_OPTS=fm
 LONG_OPTS=force,minimal
@@ -36,16 +36,17 @@ done
 FILES=(.emacs)
 OUTPUT=~/
 EMACS_DIR=~/.emacs.d/
-ARGS_COPY=--verbose --recursive
+ARGS_COPY='--verbose --recursive'
 
-if [ $FORCE ]
+if [ $FORCE -eq 1 ]
 then
     ARGS_COPY+=' --force'
 else
     ARGS_COPY+=' --interactive'
 fi
 
-sudo apt-get install emacs -y
+### Installing clang for company
+sudo apt-get install emacs clang -y
 
 ### Set .emacs
 cp $ARGS_COPY ${FILES[@]} $OUTPUT

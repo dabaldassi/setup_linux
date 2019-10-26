@@ -3,6 +3,8 @@
 	email = "david.baldassin@etu.uca.fr"
 [alias]
 	sm  = submodule
+	st  = status
+	aa  = add -a
 	co  = checkout
 	ss  = status -s
 	cm  = commit -m

@@ -37,9 +37,9 @@ done
 
 FILES=(.bash_aliases .bashrc .bash/ .inputrc)
 OUTPUT=~/
-ARGS_COPY=--verbose --recursive
+ARGS_COPY='--verbose --recursive'
 
-if [ $FORCE ]
+if [ $FORCE -eq 1 ]
 then
     ARGS_COPY+=' --force'
 else
