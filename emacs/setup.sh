@@ -57,8 +57,7 @@ cd $EMACS_DIR
 mkdir -p snippets && cd snippets
 
 ### Clone the snippets for yasnippets
-### TODO : fork the repo and add my own snippets
-git clone https://github.com/AndreaCrotti/yasnippet-snippets.git
+git clone https://github.com/dabaldassi/yasnippet-snippets.git
 
 ### Return to the original directory
 cd -
