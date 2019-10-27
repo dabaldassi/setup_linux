@@ -4,7 +4,7 @@
 [alias]
 	sm  = submodule
 	st  = status
-	aa  = add -a
+	aa  = add -A
 	co  = checkout
 	ss  = status -s
 	cm  = commit -m
