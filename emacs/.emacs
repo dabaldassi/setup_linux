@@ -57,14 +57,8 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-;; (add-to-list 'load-path "~/.emacs.d/plugins/neotree")
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
-
-(setq load-path (cons "/usr/local/bin/global-6.5.7" load-path))
-(autoload 'gtags-mode "gtags" "" t)
-(global-set-key [f6] 'gtags-find-rtag)
-(global-set-key (kbd "C-<f6>") 'gtags-mode)
 
 (require 'company)
 (require 'company-anaconda)
@@ -78,6 +72,10 @@
   '(add-to-list 'company-backends 'company-irony))
 (eval-after-load 'company 
   '(add-to-list 'company-backends 'company-c-headers))
+
+(require 'cc-mode)
+(define-key c-mode-map  (kbd "<C-tab>") 'company-complete)
+(define-key c++-mode-map  (kbd "<C-tab>") 'company-complete)
 
 (require 'cmake-ide)
 (require 'subr-x)
@@ -145,3 +143,50 @@
 (nyan-mode 1)
 (global-set-key (kbd "<f12>") 'nyan-start-music)
 (global-set-key (kbd "C-x <f12>") 'nyan-stop-music)
+
+(defun duplicate-line(n)
+  (interactive "P")
+  (setq register 0)
+  
+  (beginning-of-line)
+  (cua-set-mark)
+  (end-of-line)
+  (cua-copy-region register)
+
+  (defun p(n)
+    (interactive)
+    (if (not n)
+	(setq n 1))
+    (newline)
+    (cua-paste register)
+  
+    (if (> n 1)
+	(p (- n 1)))
+    )
+  (p n)
+  )
+
+(defun two_points ()
+  (interactive)
+  (insert "::")
+  (company-complete)
+  )
+
+(defun draw_arrow ()
+  (interactive)
+  (insert "->")
+  (company-complete)
+  )
+
+(global-set-key (kbd "C-c d") 'duplicate-line)
+
+(add-hook
+ 'c++-mode-hook
+ (lambda ()
+   (local-set-key (kbd "§") 'two_points)
+   (local-set-key (kbd "ù") 'draw_arrow)))
+
+(add-hook
+ 'c-mode-hook
+ (lambda ()
+   (local-set-key (kbd "ù") 'draw_arrow)))

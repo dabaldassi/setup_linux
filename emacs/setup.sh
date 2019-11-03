@@ -45,9 +45,6 @@ else
     ARGS_COPY+=' --interactive'
 fi
 
-### Installing clang for company
-sudo apt-get install emacs clang -y
-
 ### Set .emacs
 cp $ARGS_COPY ${FILES[@]} $OUTPUT
 

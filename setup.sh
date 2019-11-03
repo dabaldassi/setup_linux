@@ -114,7 +114,8 @@ then
     log_out "Upgrading packages"
     sudo $PKG_MGR upgrade
     log_out "Installing new packages..."
-    sudo $PKG_MGR install build-essential global bash-completion apt-file valgrind git -y
+
+    sudo $PKG_MGR install build-essential global bash-completion apt-file valgrind git emacs clang -y
 fi
 
 ### bash setup
