@@ -27,6 +27,8 @@
  '(custom-enabled-themes (quote (deeper-blue)))
  '(global-linum-mode t)
  '(column-number-mode 1)
+ '(flycheck-c/c++-clang-executable "/usr/bin/clang-nocolor")
+ '(flycheck-clang-analyzer-executable "/usr/bin/clang-nocolor")
  '(helm-completion-style (quote helm))
  '(inhibit-startup-screen t)
  '(package-selected-packages
@@ -190,3 +192,11 @@
  'c-mode-hook
  (lambda ()
    (local-set-key (kbd "ù") 'draw_arrow)))
+
+(with-eval-after-load 'flycheck
+  (require 'flycheck-clang-analyzer)
+  (flycheck-clang-analyzer-setup)
+  )
+(global-flycheck-mode 1)
+
+(load-file "~/.emacs.d/plugins/member.functions.el")

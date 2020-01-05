@@ -20,3 +20,5 @@
 (package-install 'cmake-ide)
 (package-install 'nyan-mode)
 (package-install 'yasnippet)
+(package-install 'flycheck-clang-analyzer)
+

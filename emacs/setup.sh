@@ -51,6 +51,10 @@ cp $ARGS_COPY ${FILES[@]} $OUTPUT
 ### Install emacs plugins
 emacs --script install_packages.el
 
+mkdir -p $EMACS_DIR/plugins/
+cp plugins/* $EMACS_DIR/plugins/
+sudo cp clang-nocolor /usr/bin/
+
 cd $EMACS_DIR
 mkdir -p snippets && cd snippets
 
