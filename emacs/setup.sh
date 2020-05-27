@@ -59,7 +59,12 @@ cd $EMACS_DIR
 mkdir -p snippets && cd snippets
 
 ### Clone the snippets for yasnippets
-git clone https://github.com/dabaldassi/yasnippet-snippets.git
 
-### Return to the original directory
-cd -
+TMP=$(cd yasnippet-snippets)
+
+if [ $? -eq 0 ]
+then
+    git pull
+else
+    git clone https://github.com/dabaldassi/yasnippet-snippets.git
+fi

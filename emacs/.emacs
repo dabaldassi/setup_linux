@@ -4,6 +4,7 @@
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 
+;;; Code:
 (require 'package) ;; You might already have this line
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
@@ -17,23 +18,25 @@
 (add-to-list 'package-archives
              '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
-                 '("melpa" . "http://melpa.org/packages/"))
+	     '("melpa" . "http://melpa.org/packages/"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cmake-ide-cmake-args nil)
+ '(column-number-mode 1)
  '(cua-mode t nil (cua-base))
  '(custom-enabled-themes (quote (deeper-blue)))
- '(global-linum-mode t)
- '(column-number-mode 1)
  '(flycheck-c/c++-clang-executable "/usr/bin/clang-nocolor")
  '(flycheck-clang-analyzer-executable "/usr/bin/clang-nocolor")
+ '(global-linum-mode t)
  '(helm-completion-style (quote helm))
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (company-ansible nyan-mode helm dockerfile-mode docker cmake-mode company-math company-anaconda encourage-mode cmake-ide company-qml company-try-hard gh-md company))))
+    (company-irony-c-headers flycheck-irony irony-eldoc srefactor xcscope company-tern tern-auto-complete tern js2-mode cpputils-cmake markdown-mode qml-mode company-ansible nyan-mode helm dockerfile-mode docker cmake-mode company-math cmake-ide company-qml company))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -63,17 +66,34 @@
 (global-set-key [f8] 'neotree-toggle)
 
 (require 'company)
-(require 'company-anaconda)
 (require 'company-c-headers)
 (require 'company-irony)
+(require 'company-irony-c-headers)
+(require 'flycheck-irony)
 (global-company-mode)
-(eval-after-load "company"
-  '(add-to-list 'company-backends 'company-anaconda))
-(anaconda-mode)
-(eval-after-load 'company 
-  '(add-to-list 'company-backends 'company-irony))
-(eval-after-load 'company 
-  '(add-to-list 'company-backends 'company-c-headers))
+
+(defun setup_irony ()
+  "Irony mode configuration."
+  (add-hook 'irony-mode-hook 'irony-eldoc)
+  (add-to-list 'company-backends 'company-irony)
+  (add-to-list 'company-backends 'company-irony-c-headers)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
+  (when (or (eq major-mode 'c-mode)	; Prevent from being loaded by c derived mode
+	    (eq major-mode 'c++-mode))
+    (irony-mode 1)))
+
+(defun cc-base ()
+  "Common configuration for c and c++ mode."
+  ;; Company mode
+  (setf company-backends '())
+  (add-to-list 'company-backends 'company-keywords)
+  (setup_irony))
+
+(add-hook 'c++-mode-hook 'cc-base)
+
+(setq company-idle-delay 0.3)
+(setq company-minimum-prefix-length 2)
 
 (require 'cc-mode)
 (define-key c-mode-map  (kbd "<C-tab>") 'company-complete)
@@ -200,3 +220,82 @@
 (global-flycheck-mode 1)
 
 (load-file "~/.emacs.d/plugins/member.functions.el")
+
+(require 'cpputils-cmake)
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (if (derived-mode-p 'c-mode 'c++-mode)
+                (cppcm-reload-all)
+              )))
+
+(require 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+(require 'js2-refactor)
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c m")
+
+(require 'tern)
+(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+(require 'company-tern)
+(add-hook 'js-mode-hook '(lambda () (setq-local company-backends '((company-web company-css company-tern :with company-yasnippet)))))
+
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-use-input-at-cursor t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-prefix-key "\C-cg"
+ helm-gtags-suggested-key-mapping t
+ )
+
+(require 'helm-gtags)
+;; Enable helm-gtags-mode
+(add-hook 'dired-mode-hook 'helm-gtags-mode)
+(add-hook 'eshell-mode-hook 'helm-gtags-mode)
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+(define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+(define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+(define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+(define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+
+;; (require 'rtags)
+;; (defun setup_rtags ()
+;;   "Rtags configuration.
+;; Used only for nevigation."
+;;   (interactive)
+;;   (rtags-start-process-unless-running)
+;;   (setq rtags-display-result-backend 'helm)
+;;   (global-set-key  (kbd "M-.") 'rtags-find-symbol-at-point)
+;;   (global-set-key  (kbd "M-?") 'rtags-location-stack-back)
+;;   (global-set-key  (kbd "M-,") 'rtags-location-stack-forward)
+;;   (global-set-key  (kbd "C-c r r") 'rtags-rename-symbol)
+;;    ;; '(
+     
+;;    ;; 	 ("M-?"     .  rtags-find-references-at-point)
+;;    ;;   ("M-,"     .  rtags-location-stack-back)
+;;    ;;   ("C-,"   .    rtags-location-stack-forward)
+;;    ;;   ("C-c r r" .  rtags-rename-symbolrtags-next-match)
+;;    ;;   ))
+;;   (add-hook 'kill-emacs-hook 'rtags-quit-rdm))
+
+;; (setup_rtags)
+
+;; (require 'srefactor)
+
+;; (semantic-mode 1)
+
+;; (define-key c-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+;; (define-key c++-mode-map (kbd "M-RET") 'srefactor-refactor-at-point)
+;; (global-set-key (kbd "M-RET o") 'srefactor-lisp-one-line)
+;; (global-set-key (kbd "M-RET m") 'srefactor-lisp-format-sexp)
+;; (global-set-key (kbd "M-RET d") 'srefactor-lisp-format-defun)
+;; (global-set-key (kbd "M-RET b") 'srefactor-lisp-format-buffer)
+
+;;; .Emacs ends here
