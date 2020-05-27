@@ -60,7 +60,7 @@ mkdir -p snippets && cd snippets
 
 ### Clone the snippets for yasnippets
 
-TMP=$(cd yasnippet-snippets)
+cd yasnippet-snippets > /dev/null 
 
 if [ $? -eq 0 ]
 then
