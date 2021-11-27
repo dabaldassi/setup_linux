@@ -1,0 +1,15 @@
+# SoL - Shutdown on Lan #############################################################
+# Send a magic packet to a target mac adress to shut down a pc                      #
+#                                                                                   #
+#####################################################################################
+
+function sol {
+    if [ $# -eq 1 ]
+    then
+	MAC=$1
+	echo -e $(echo $(printf '0%.0s' {1..12}; printf "$(echo $MAC | sed 's/://g')%.0s" {1..16}) | sed -e 's/../\\x&/g') | nc -w1 -u -b 255.255.255.255 8009
+    else
+	echo "You must provide a MAC address"
+	return 1
+    fi
+}
