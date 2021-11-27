@@ -1,0 +1,4 @@
+
+function notify {
+    $@ && notify-send "$1 finished succesfully" || notify-send "$1 failed : $?"
+}
