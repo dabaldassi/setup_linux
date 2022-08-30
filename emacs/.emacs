@@ -20,11 +20,18 @@
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.org/packages/"))
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(c-default-style
+   (quote
+    ((c-mode . "linux")
+     (java-mode . "java")
+     (awk-mode . "awk")
+     (other . "gnu"))))
  '(cmake-ide-cmake-args nil)
  '(column-number-mode 1)
  '(cua-mode t nil (cua-base))
@@ -36,13 +43,17 @@
  '(inhibit-startup-screen t)
  '(package-selected-packages
    (quote
-    (company-irony-c-headers flycheck-irony irony-eldoc srefactor xcscope company-tern tern-auto-complete tern js2-mode cpputils-cmake markdown-mode qml-mode company-ansible nyan-mode helm dockerfile-mode docker cmake-mode company-math cmake-ide company-qml company))))
+    (go-mode web-completion-data yaml-mode lsp-ui lsp-mode cargo cargo-mode glsl-mode gn-mode company-irony-c-headers flycheck-irony irony-eldoc srefactor xcscope company-tern tern-auto-complete tern js2-mode cpputils-cmake markdown-mode qml-mode company-ansible nyan-mode helm dockerfile-mode docker cmake-mode company-math cmake-ide company-qml company)))
+ '(safe-local-variable-values (quote ((setq c-default-style "linux"))))
+ '(use-file-dialog nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(setq make-backup-files nil)
 
 (require 'yasnippet)
 (yas-global-mode 1)
@@ -67,18 +78,18 @@
 
 (require 'company)
 (require 'company-c-headers)
-(require 'company-irony)
-(require 'company-irony-c-headers)
-(require 'flycheck-irony)
+;; (require 'company-irony)
+;; (require 'company-irony-c-headers)
+;; (require 'flycheck-irony)
 (global-company-mode)
 
 (defun setup_irony ()
   "Irony mode configuration."
   (add-hook 'irony-mode-hook 'irony-eldoc)
-  (add-to-list 'company-backends 'company-irony)
-  (add-to-list 'company-backends 'company-irony-c-headers)
+  ;; (add-to-list 'company-backends 'company-irony)
+  ;; (add-to-list 'company-backends 'company-irony-c-headers)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
+  ;; (add-hook 'flycheck-mode-hook 'flycheck-irony-setup)
   (when (or (eq major-mode 'c-mode)	; Prevent from being loaded by c derived mode
 	    (eq major-mode 'c++-mode))
     (irony-mode 1)))
@@ -86,12 +97,13 @@
 (defun cc-base ()
   "Common configuration for c and c++ mode."
   ;; Company mode
-  (setf company-backends '())
-  (add-to-list 'company-backends 'company-keywords)
+  ;; (setf company-backends '())
+  ;; (add-to-list 'company-backends 'company-keywords)
   (setup_irony))
 
 (add-hook 'c++-mode-hook 'cc-base)
 
+(setq company-backends (delete 'company-semantic company-backends))
 (setq company-idle-delay 0.3)
 (setq company-minimum-prefix-length 2)
 
@@ -217,8 +229,8 @@
   (require 'flycheck-clang-analyzer)
   (flycheck-clang-analyzer-setup)
   )
-(global-flycheck-mode 1)
 
+(global-flycheck-mode 1)
 (load-file "~/.emacs.d/plugins/member.functions.el")
 
 (require 'cpputils-cmake)
@@ -238,8 +250,8 @@
 
 (require 'tern)
 (add-hook 'js-mode-hook (lambda () (tern-mode t)))
-(require 'company-tern)
-(add-hook 'js-mode-hook '(lambda () (setq-local company-backends '((company-web company-css company-tern :with company-yasnippet)))))
+;; (require 'company-tern)
+;; (add-hook 'js-mode-hook '(lambda () (setq-local company-backends '((company-web company-css company-tern :with company-yasnippet)))))
 
 (setq
  helm-gtags-ignore-case t
@@ -264,6 +276,18 @@
 (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
 (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
 (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+
+(defun namespace-indent ()
+   (c-set-offset 'innamespace [0]))
+(add-hook 'c++-mode-hook 'namespace-indent)
+
+;; (c-set-offset
+;;  '(c-offsets-alist . ((case-label . 0)
+;;                       (inline-open . 0)
+;;                       (substatement-open . 0)
+;;                       (inlambda . 0) ; no extra indent for lambda
+;;                       (block-open . 0) ; no space before {
+;;                       (knr-argdecl-intro . -))))
 
 ;; (require 'rtags)
 ;; (defun setup_rtags ()

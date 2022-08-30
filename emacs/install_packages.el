@@ -32,8 +32,8 @@
 (package-install 'flycheck-irony)
 (package-install 'js2-mode)
 (package-install 'js2-refactor)
-(package-install 'tern)
-(package-install 'company-tern)
+;; (package-install 'tern)
+;; (package-install 'company-tern)
 
 (irony-install-server)
 
